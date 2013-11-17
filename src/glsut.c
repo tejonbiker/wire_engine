@@ -44,13 +44,18 @@ int  glsutLoadShaders(FILE *messages, BaseShader *info_shader, char *fragment_fi
 	while(!feof(FragmentShader))
 	{
 		returnRead=fgets(tempRead, 1024, FragmentShader);
+		if(returnRead==NULL)
+			break;
 		tempRead+=strlen(returnRead);
+		
 	}
 	
 	tempRead=srcVertex;
 	while(!feof(VertexShader))
 	{
 		returnRead=fgets(tempRead, 1024, VertexShader);
+		if(returnRead==NULL)
+			break;
 		tempRead+=strlen(returnRead);
 	}
 	

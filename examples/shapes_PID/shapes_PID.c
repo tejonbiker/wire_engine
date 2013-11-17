@@ -382,7 +382,8 @@ void 	getShaderVars()
 	VarShaders.Position=glGetAttribLocation(ShaderInfo.program,"Position");
 	VarShaders.Colors=glGetAttribLocation(ShaderInfo.program,"Colors");
 
-	/*
+
+	/*	
 	ptrVars=(GLint*)(&VarShaders);
 	for(i=0;i<sizeof(varShaders);i+=sizeof(int))
 	{
@@ -393,7 +394,8 @@ void 	getShaderVars()
 			exit(0);
 		}
 		ptrVars++;
-	}*/
+	}
+	*/
 }
 
 void setup()
@@ -403,6 +405,8 @@ void setup()
 	glClearDepthf(1.0f);
 	glDepthMask(GL_TRUE);
 	//glDepthRange(0.0f, 1.0f);
+
+	printf("Loading shaders....\n");
 
 	if(glsutLoadShaders(stdout,&ShaderInfo,"fragment_shader","vertex_shader")<0)
 	{
@@ -489,11 +493,13 @@ int main(void)
 {
 	int res=0;
 
+
+	printf("Init EGL...\n");
 	res =glpiInit();
 
 	if(res<0)
 	{
-		printf("Error: %i",res);
+		printf("Error: %i\n",res);
 		return 0;
 	}
 
