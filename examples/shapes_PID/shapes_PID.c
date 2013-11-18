@@ -369,12 +369,12 @@ void display()
     FiguraDibuja(&BufferFig);
 
     counter_steps++;
-    printf("ErrorTotal: %f\n",totalError);
+    //printf("ErrorTotal: %f\n",totalError);
     //SOIL_save_screenshot("pic1.bmp",SOIL_SAVE_TYPE_BMP,0,0,win_width,win_height);
 
     if(totalError<MAX_ERROR)
     {
-	printf("Total Steps to change from %i to %i: %i\n",current,next,counter_steps);
+	//printf("Total Steps to change from %i to %i: %i\n",current,next,counter_steps);
 
         current++;
         current=current%nFiguras;
