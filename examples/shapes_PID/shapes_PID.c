@@ -551,9 +551,10 @@ int main(int argc, char **argv)
 		if(argc>=4)
 			PIDParameters[2]=atof(argv[3]);
 	}else{
-		PIDParameters[0]=0.1;
-		PIDParameters[1]=0.01;
-		PIDParameters[2]=0.033;
+		PIDParameters[0]=0.01;
+		PIDParameters[1]=150;
+		PIDParameters[2]=90;
+
 
 		printf("Default Parameters\n");
 	}
