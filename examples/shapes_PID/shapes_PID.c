@@ -556,7 +556,11 @@ int main(int argc, char **argv)
 		PIDParameters[2]=90;
 
 
-		printf("Default Parameters\n");
+		printf("\n\n\nDefault Parameters\n");
+		printf("Usage: ./shapes_PID.bin 0.01 150 90\n");
+		printf("The elments are P,I and D respectively\n");
+		printf("The PID equation is as follow:\n");
+		printf("u(n)= K*e(n)  + K/I*accum_e(n) +  K*D*(y(n) - y(n-1))\n\n\n");
 	}
 
 	printf("P:%f I:%f D:%f\n",PIDParameters[0],PIDParameters[1],PIDParameters[2]);
