@@ -25,7 +25,7 @@ int  glsutLoadShaders(FILE *messages, BaseShader *info_shader, char *fragment_fi
 	if(FragmentShader==NULL)
 	{
 		if(messages!=NULL)
-			fprintf(messages,"Error in open %sn",fragment_file);
+			fprintf(messages,"Error in open %s\n",fragment_file);
 		return SUT_ERR_FILE;
 	}
 	
@@ -34,7 +34,7 @@ int  glsutLoadShaders(FILE *messages, BaseShader *info_shader, char *fragment_fi
 	if(VertexShader==NULL)
 	{
 		if(messages!=NULL)
-			fprintf(messages,"Error in open %sn",vertex_file);
+			fprintf(messages,"Error in open %s\n",vertex_file);
 		
 		fclose(FragmentShader);
 		return SUT_ERR_FILE;
