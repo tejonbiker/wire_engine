@@ -1,0 +1,9 @@
+varying  vec4		DestColor;
+varying	 vec2 		outTexture;
+uniform sampler2D	unitTexture;
+
+
+void main(void)
+{
+     gl_FragColor=DestColor*texture2D(unitTexture,outTexture);
+}

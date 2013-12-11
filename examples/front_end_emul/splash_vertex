@@ -1,0 +1,16 @@
+uniform   mat4 Projection;
+uniform   mat4 Modelview;
+attribute vec4 Vertex;
+attribute vec4 Colors;
+attribute vec2 Texture;
+varying   vec4 DestColor;
+varying	  vec2 outTexture;
+uniform   float t;
+
+void main(void)
+{
+  gl_Position=Projection*Modelview*Vertex;  
+  gl_Position=Modelview*Vertex;
+  outTexture=Texture;
+  DestColor=Colors;
+}

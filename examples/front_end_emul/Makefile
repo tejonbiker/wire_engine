@@ -1,6 +1,6 @@
  FLAGS=-I/opt/vc/include/  -I/opt/vc/include/interface/vcos/pthreads/  -I/opt/vc/include/interface/vmcs_host/linux -I../../src/
  LIBS= -lGLESv2 -lEGL -lm -lbcm_host -L/opt/vc/lib -lSOIL
- SRC= ../../src/glpi.c ../../src/glsut.c  front_end_emul.c
+ SRC= ../../src/glpi.c ../../src/glsut.c ../../src/wemat.c ../../src/we_splash_screen.c ../../src/weobject.c front_end_emul.c
  OBJECTS=$(SRC:.c=.o)
  EXECUTABLE=front_end_emu.bin
  CC=gcc
