@@ -119,7 +119,6 @@ void setup()
 	glpiGetWindowSize(&win_width,&win_height);
 
 	window_resize();
-	//wematIdentity(proj_matrix);
 	weSplashInit(NULL,proj_matrix);
 
 	
@@ -144,7 +143,7 @@ int main(void)
 
 	glBindFramebuffer(GL_FRAMEBUFFER,0);
 	
-	glClearColor(1.0f,1.0f,1.0f,1.0f); 	
+	glClearColor(1.0f,1.0f,1.0f,0.0f); 	
 
 	while(!finish){
 		display();
