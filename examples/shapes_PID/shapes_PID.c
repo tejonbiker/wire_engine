@@ -57,6 +57,7 @@ FiguraInfo BufferFig;
 
 //Estructuras para los shaders
 BaseShader ShaderInfo;
+float PIDParameters[3];
 
 int win_width, win_height;
 
@@ -261,9 +262,9 @@ int interpola(FiguraInfo *fig1, FiguraInfo *fig2, FiguraInfo *dest, float step)
     }
 }
 
-int PID(FiguraInfo *fig1, FiguraInfo *fig2, FiguraInfo *dest,ErrorContenedor *cont, float *totalError)
+int PID(FiguraInfo *fig1, FiguraInfo *fig2, FiguraInfo *dest,ErrorContenedor *cont, float *totalError, float *PIDParams)
 {
-    //float P=0.3,I=0.03,D=0.1;
+    //float P=0.3,I=0.03,D=0.=1;
     float P=0.1,I=0.01,D=0.033;
 
     float *ptrVertices1=NULL,*ptrVertices2=NULL;
@@ -276,11 +277,16 @@ int PID(FiguraInfo *fig1, FiguraInfo *fig2, FiguraInfo *dest,ErrorContenedor *co
     float *ptrErrorActual=NULL;
     float *ptrErrorAnterior=NULL;
     float *ptrErrorAcumulativo=NULL;
+    float bufferDest[3];
 
-    if(fig1==NULL || fig2==NULL || dest==NULL)
+    if(fig1==NULL || fig2==NULL || dest==NULL || PIDParams==NULL || cont==NULL || totalError==NULL)
         return -1;
 
     *totalError=0;
+
+    P=PIDParams[0];
+    I=PIDParams[1];
+    D=PIDParams[2];
 
     ptrErrorActual=cont->ErrorActual;
     ptrErrorAnterior=cont->ErrorAnterior;
@@ -306,15 +312,20 @@ int PID(FiguraInfo *fig1, FiguraInfo *fig2, FiguraInfo *dest,ErrorContenedor *co
 	ptrErrorAcumulativo[1]+=ptrErrorActual[1];
 	ptrErrorAcumulativo[2]+=ptrErrorActual[2];
 
+	/*
         ptrVerticesDest[0]  += (ptrErrorActual[0])*P  +  (ptrErrorAcumulativo[0])*I   +  (ptrErrorActual[0] - ptrErrorAnterior[0])*D;
         ptrVerticesDest[1]  += (ptrErrorActual[1])*P  +  (ptrErrorAcumulativo[1])*I   +  (ptrErrorActual[1] - ptrErrorAnterior[1])*D;
         ptrVerticesDest[2]  += (ptrErrorActual[2])*P  +  (ptrErrorAcumulativo[2])*I   +  (ptrErrorActual[2] - ptrErrorAnterior[2])*D;
-
-        ptrErrorAnterior[0] =ptrErrorActual[0];
-        ptrErrorAnterior[1] =ptrErrorActual[1];
-        ptrErrorAnterior[2] =ptrErrorActual[2];
+	*/
 
 	
+	ptrVerticesDest[0]  += (ptrErrorActual[0])*P  +  (ptrErrorAcumulativo[0])*P/I   +  (ptrErrorAnterior[0])*D*P;
+        ptrVerticesDest[1]  += (ptrErrorActual[1])*P  +  (ptrErrorAcumulativo[1])*P/I   +  (ptrErrorAnterior[1])*D*P;
+        ptrVerticesDest[2]  += (ptrErrorActual[2])*P  +  (ptrErrorAcumulativo[2])*P/I   +  (ptrErrorAnterior[2])*D*P;
+	
+	ptrErrorAnterior[0]=(ptrErrorActual[0])*P  +  (ptrErrorAcumulativo[0])*P/I   +  (ptrErrorAnterior[0])*D*P;
+	ptrErrorAnterior[1]=(ptrErrorActual[1])*P  +  (ptrErrorAcumulativo[1])*P/I   +  (ptrErrorAnterior[1])*D*P;
+	ptrErrorAnterior[2]=(ptrErrorActual[2])*P  +  (ptrErrorAcumulativo[2])*P/I   +  (ptrErrorAnterior[2])*D*P;
 
         if(verticeError>MAX_THRESHOLD)
         {
@@ -359,12 +370,12 @@ void display()
     static int next=1;
     int MAX_STEPS=1024;
     float totalError;
-    float MAX_ERROR=0.01f;
+    float MAX_ERROR=0.015f;
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     //interpola(Figuras+current, Figuras+next,&BufferFig,counter_steps/((float)(MAX_STEPS)));
-    PID(Figuras+current,Figuras+next,&BufferFig,&ErrorEjes,&totalError);
+    PID(Figuras+current,Figuras+next,&BufferFig,&ErrorEjes,&totalError,PIDParameters);
 
     FiguraDibuja(&BufferFig);
 
@@ -511,10 +522,9 @@ int ErrorLimpia(ErrorContenedor *cont)
     return 0;
 }
 
-int main(void)
+int main(int argc, char **argv)
 {
 	int res=0;
-
 
 	printf("Init EGL...\n");
 	res =glpiInit();
@@ -524,6 +534,36 @@ int main(void)
 		printf("Error: %i\n",res);
 		return 0;
 	}
+
+	//Parser segment
+	PIDParameters[0]=0.0;
+	PIDParameters[1]=0.0;
+	PIDParameters[2]=0.0;
+
+	if(argc>=2)
+	{
+		if(argc>=2)
+			PIDParameters[0]=atof(argv[1]);
+
+		if(argc>=3)
+			PIDParameters[1]=atof(argv[2]);
+
+		if(argc>=4)
+			PIDParameters[2]=atof(argv[3]);
+	}else{
+		PIDParameters[0]=0.01;
+		PIDParameters[1]=150;
+		PIDParameters[2]=90;
+
+
+		printf("\n\n\nDefault Parameters\n");
+		printf("Usage: ./shapes_PID.bin 0.01 150 90\n");
+		printf("The elments are P,I and D respectively\n");
+		printf("The PID equation is as follow:\n");
+		printf("u(n)= K*e(n)  + K/I*accum_e(n) +  K*D*(y(n) - y(n-1))\n\n\n");
+	}
+
+	printf("P:%f I:%f D:%f\n",PIDParameters[0],PIDParameters[1],PIDParameters[2]);
 
 	setup();
 
