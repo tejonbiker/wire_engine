@@ -31,83 +31,93 @@ WEShaderVars   points_shader_vars;
 int win_width, win_height;
 float proj_matrix[16];
 
-#define N_COLORPOINTS 20
+#define N_COLORPOINTS 200
 
-typedef struct tagColorPoint{
-	WEVect3  vertex;
-	WEVect3  color;
-}ColorPoint;
+int skip=3;
 
-ColorPoint arrayCPoints[N_COLORPOINTS];
+
+WEPoint arrayCPoints[N_COLORPOINTS];
 
 int fillVector=0;
 
 
 void display()
 {
-    static int i=0;
-    static int counter_steps=0;
-    static int current=0;
-    static int next=1;
-    int res;
-    int MAX_STEPS=1024;
-    float totalError;
-    float MAX_ERROR=0.01f;  
-    static float transition=0.0f;
-    float   mv_points[16];
-    float   color_points[3]={0.0,0.0,0.0};
-    float   result_cat[3]={0.0,0.0,0.0};
-    static float   t=0.0;
+    	static int i=0;
+    	static int counter_steps=0;
+   	static int current=0;
+    	static int next=1;
+    	int res;
+    	int MAX_STEPS=1024;
+    	float totalError;
+    	float MAX_ERROR=0.01f;  
+    	static float transition=0.0f;
+    	float   mv_points[16];
+    	float   color_points[3]={0.0,0.0,0.0};
+    	float   result_cat[3]={0.0,0.0,0.0};
+    	static float   t=0.0;
   
-    transition+=0.005f;
-    t+=0.005;
+    	transition+=0.005f;
+    	t+=0.005;
 
-    if(t>1.0f)
-	t=0.0f;
+    	if(t>1.0f)
+		t=0.0f;
+    	
+    	glClearColor(1.0,1.0,1.0,transition);
+   	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    if(transition>1.0f)
-	transition=1.0f;
 
-    glClearColor(1.0,1.0,1.0,transition);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	if(transition>1.0f)
+		transition=1.0f;
+	else
+	{
+		glFlush();
+    		glFinish();
+    		glpiSwapBuffers();
 
-   res=weCatmullEvalArray(&tray_one,0.005,result_cat);
+		return;
+	}		
 
-   if(res==1)
-   {
-	weCatmullRewind(&tray_one);
-   }
+   	res=weCatmullEvalArray(&tray_one,0.005,result_cat);
 
-    wematIdentity(mv_points);
-    glUseProgram(ShaderInfo.program);
-    //wePointDraw(tray_one.points,tray_one.nPoints,&points_shader_vars,color_points,mv_points);
-    wePointDraw((WEVect3*)result_cat,1,&points_shader_vars,color_points,mv_points);
+   	if(res==1)
+   	{
+		weCatmullRewind(&tray_one);
+   	}
 
-    	if(fillVector>=N_COLORPOINTS)
+    	wematIdentity(mv_points);
+    	glUseProgram(ShaderInfo.program);
+    	//weVect3Draw(tray_one.points,tray_one.nPoints,&points_shader_vars,color_points,mv_points);
+    	weVect3Draw((WEVect3*)result_cat,1,&points_shader_vars,color_points,mv_points);
+	wePointDraw(arrayCPoints,fillVector,&points_shader_vars,mv_points);
+
+    	if(fillVector<=N_COLORPOINTS-1)
     	{
-	   	arrayCPoints[fillVector].vertex.x=result_cat[0];
-	    	arrayCPoints[fillVector].vertex.y=result_cat[1];
-		arrayCPoints[fillVector].vertex.z=result_cat[2];
+	   	arrayCPoints[fillVector].vertex[0]=result_cat[0];
+	    	arrayCPoints[fillVector].vertex[1]=result_cat[1];
+		arrayCPoints[fillVector].vertex[2]=result_cat[2];
 		
 		fillVector++;
 	}
 	else
 	{
-		for(i=1;i<N_COLORPOINTS-1;i++)
+		
+		for(i=N_COLORPOINTS-1;i>=0;i--)
 		{
-			arrayCPoints[i].vertex.x=arrayCPoints[i-1].vertex.x;
-			arrayCPoints[i].vertex.y=arrayCPoints[i-1].vertex.y;
-			arrayCPoints[i].vertex.z=arrayCPoints[i-1].vertex.z;
+			arrayCPoints[i].vertex[0]=arrayCPoints[i-1].vertex[0];
+			arrayCPoints[i].vertex[1]=arrayCPoints[i-1].vertex[1];
+			arrayCPoints[i].vertex[2]=arrayCPoints[i-1].vertex[2];
 		}
 
-		arrayCPoints[0].vertex.x=result_cat[0];
-		arrayCPoints[0].vertex.y=result_cat[1];
-		arrayCPoints[0].vertex.z=result_cat[2];
+		arrayCPoints[0].vertex[0]=result_cat[0];
+		arrayCPoints[0].vertex[1]=result_cat[1];
+		arrayCPoints[0].vertex[2]=result_cat[2];
+		
 	}
 
-    glFlush();
-    glFinish();
-    glpiSwapBuffers();
+    	glFlush();
+    	glFinish();
+    	glpiSwapBuffers();
 }
 
 void 	getShaderVars()
@@ -188,9 +198,9 @@ void setup()
 
 	for(i=0;i<N_COLORPOINTS;i++)
 	{
-		arrayCPoints[i].color.x=(rand()%255)/255.0f;
-		arrayCPoints[i].color.y=(rand()%255)/255.0f;
-		arrayCPoints[i].color.z=(rand()%255)/255.0f;
+		arrayCPoints[i].color[0]=1.0-(N_COLORPOINTS-i)/(float)N_COLORPOINTS;
+		arrayCPoints[i].color[1]=1.0-(N_COLORPOINTS-i)/(float)N_COLORPOINTS;
+		arrayCPoints[i].color[2]=1.0-(N_COLORPOINTS-i)/(float)N_COLORPOINTS;
 	}
 }
 
