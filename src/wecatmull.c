@@ -85,7 +85,7 @@ int weCatmullArrayFromFile(char *filename,CatmullArray *arrayDest)			//Load a li
 {
 	arrayDest->currentPoint=0;
 	arrayDest->currentEval=0.0f;
-	return wePointFromFile(filename,&(arrayDest->points),&(arrayDest->nPoints));
+	return weVect3FromFile(filename,&(arrayDest->points),&(arrayDest->nPoints));
 }
 
 int weCatmullRewind(CatmullArray *array)

@@ -81,8 +81,8 @@ void display()
 
     wematIdentity(mv_points);
     glUseProgram(ShaderInfo.program);
-    //wePointDraw(tray_one.points,tray_one.nPoints,&points_shader_vars,color_points,mv_points);
-    wePointDraw((WEVect3*)result_cat,1,&points_shader_vars,color_points,mv_points);
+    //weVect3Draw(tray_one.points,tray_one.nPoints,&points_shader_vars,color_points,mv_points);
+    weVect3Draw((WEVect3*)result_cat,1,&points_shader_vars,color_points,mv_points);
 
     glFlush();
     glFinish();
@@ -182,23 +182,6 @@ int main(void)
 	{
 		printf("Error: %i\n",res);
 		return 0;
-	}
-
-
-	res= wePointFromFile("trayectories/test_points.txt",&ptrData,&nPoints);
-	if(res<0)
-	{
-		printf("Error: %i\n",res);
-		return 0;
-	}
-	else
-	{
-		printf("Total Points Readed: %i\n",nPoints);
-
-		for(i=0;i<nPoints;i++)
-		{
-			printf("%f,%f,%f\n",ptrData[i].x,ptrData[i].y,ptrData[i].z);
-		}
 	}
 
 	res=weCatmullArrayFromFile("trayectories/test_points.txt",&tray_one);

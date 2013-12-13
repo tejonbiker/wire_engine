@@ -66,7 +66,7 @@ int  weQuadCoordTex(float *ct,WEQuad *quad)
 	return 0;
 }
 
-int  wePointFromFile(char *filename,WEVect3 **ptrDest,int *n) //Read points from file, in n is the total points readed
+int  weVect3FromFile(char *filename,WEVect3 **ptrDest,int *n) //Read points from file, in n is the total points readed
 {
 	FILE *filePoints=NULL;
 	int res,i;
@@ -111,7 +111,7 @@ int  wePointFromFile(char *filename,WEVect3 **ptrDest,int *n) //Read points from
 	return 0;
 }
 
-int  wePointDraw(WEVect3 *array,int nPoints, WEShaderVars *shader_vars, float *color, float *mv)
+int  weVect3Draw(WEVect3 *array,int nPoints, WEShaderVars *shader_vars, float *color, float *mv)
 {
 	float *colors;
 	float *ptr_aux;
@@ -141,7 +141,8 @@ int  wePointDraw(WEVect3 *array,int nPoints, WEShaderVars *shader_vars, float *c
 	glVertexAttribPointer(shader_vars->color_attrib,3,GL_FLOAT,0,0,colors);
 	glVertexAttribPointer(shader_vars->vertex_attrib,3,GL_FLOAT,0,0,&(array->x));	
 
-	glUniformMatrix4fv(shader_vars->modelview,1,0,mv);
+	if(mv!=NULL)
+		glUniformMatrix4fv(shader_vars->modelview,1,0,mv);
 
 	glDrawArrays(GL_POINTS,0,nPoints);
 
@@ -152,25 +153,26 @@ int  wePointDraw(WEVect3 *array,int nPoints, WEShaderVars *shader_vars, float *c
 	return 0;
 }
 
-
-int  wePointDrawColor(WEVect3 *array,WEVect3 *color,int nPoints, WEShaderVars *shader_vars, float *mv)
+int  wePointDraw(WEPoint *array,int nPoints,WEShaderVars *shader_vars, float *mv)
 {
 	float *ptr_aux;
 	int i;
 	float *vertex;
 
-	if(array==NULL || shader_vars==NULL || color==NULL || mv==NULL)
+	if(array==NULL || shader_vars==NULL)
 		return -1;
+
 
 	glEnableVertexAttribArray(shader_vars->color_attrib);
 	glEnableVertexAttribArray(shader_vars->vertex_attrib);
 
 	glDisable(GL_TEXTURE_2D);
 
-	glVertexAttribPointer(shader_vars->color_attrib,3,GL_FLOAT,0,0, &(color->x));
-	glVertexAttribPointer(shader_vars->vertex_attrib,3,GL_FLOAT,0,0,&(array->x));	
+	glVertexAttribPointer(shader_vars->color_attrib,3,GL_FLOAT,0,sizeof(WEPoint),&(array->color));
+	glVertexAttribPointer(shader_vars->vertex_attrib,3,GL_FLOAT,0,sizeof(WEPoint),&(array->vertex));	
 
-	glUniformMatrix4fv(shader_vars->modelview,1,0,mv);
+	if(mv!=NULL)
+		glUniformMatrix4fv(shader_vars->modelview,1,0,mv);
 
 	glDrawArrays(GL_POINTS,0,nPoints);
 

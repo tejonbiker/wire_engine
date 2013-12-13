@@ -10,7 +10,7 @@ typedef struct tagWEVec3{
 	float x,y,z;
 }WEVect3;
 
-typedef strcut tagWEPoint{
+typedef struct tagWEPoint{
 	float vertex[3];
 	float color[3];
 	float texcoord[2];
@@ -38,9 +38,9 @@ typedef struct tagWEShaderVars{
 int  weQuadCreate(WEQuad *object,float *color,int texture_id); 	//Create a quad with normal outside the screen
 int  weQuadCoordTex(float *ct,WEQuad *quad);		      	//Setup the texture coords of an Quad
 
-int  wePointFromFile(char *filename,WEVect3 **ptrDest,int *n); //Read points from file, in n is the total points readed
-int  wePointDraw(WEVect3 *array, int nPoints ,WEShaderVars *shader_vars, float *color, float *mv);
-int  wePointDrawColor(WEVect3 *array,WEVect3 *color,int nPoints, WEShaderVars *shader_vars, float *mv);
+int  weVect3FromFile(char *filename,WEVect3 **ptrDest,int *n); //Read points from file, in n is the total points readed
+int  weVect3Draw(WEVect3 *array, int nPoints ,WEShaderVars *shader_vars, float *color, float *mv);
+int  wePointDraw(WEPoint *array,int nPoints,WEShaderVars *shader_vars, float *mv);
 
 #endif
 
