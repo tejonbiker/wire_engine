@@ -31,6 +31,18 @@ WEShaderVars   points_shader_vars;
 int win_width, win_height;
 float proj_matrix[16];
 
+#define N_COLORPOINTS 20
+
+typedef struct tagColorPoint{
+	WEVect3  vertex;
+	WEVect3  color;
+}ColorPoint;
+
+ColorPoint arrayCPoints[N_COLORPOINTS];
+
+int fillVector=0;
+
+
 void display()
 {
     static int i=0;
@@ -46,7 +58,6 @@ void display()
     float   color_points[3]={0.0,0.0,0.0};
     float   result_cat[3]={0.0,0.0,0.0};
     static float   t=0.0;
-    WEVect3 vect_result;
   
     transition+=0.005f;
     t+=0.005;
@@ -60,15 +71,6 @@ void display()
     glClearColor(1.0,1.0,1.0,transition);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    //weSplashPlay();
-
-    /*
-    weCatmullEval(&(tray_one.points[0].x),
-		  &(tray_one.points[1].x),
-		  &(tray_one.points[2].x),
-		  &(tray_one.points[3].x),t,result_cat);    
-   */
-
    res=weCatmullEvalArray(&tray_one,0.005,result_cat);
 
    if(res==1)
@@ -76,13 +78,32 @@ void display()
 	weCatmullRewind(&tray_one);
    }
 
-
-    memcpy(&(vect_result.x),result_cat,sizeof(float)*3);
-
     wematIdentity(mv_points);
     glUseProgram(ShaderInfo.program);
     //wePointDraw(tray_one.points,tray_one.nPoints,&points_shader_vars,color_points,mv_points);
     wePointDraw((WEVect3*)result_cat,1,&points_shader_vars,color_points,mv_points);
+
+    	if(fillVector>=N_COLORPOINTS)
+    	{
+	   	arrayCPoints[fillVector].vertex.x=result_cat[0];
+	    	arrayCPoints[fillVector].vertex.y=result_cat[1];
+		arrayCPoints[fillVector].vertex.z=result_cat[2];
+		
+		fillVector++;
+	}
+	else
+	{
+		for(i=1;i<N_COLORPOINTS-1;i++)
+		{
+			arrayCPoints[i].vertex.x=arrayCPoints[i-1].vertex.x;
+			arrayCPoints[i].vertex.y=arrayCPoints[i-1].vertex.y;
+			arrayCPoints[i].vertex.z=arrayCPoints[i-1].vertex.z;
+		}
+
+		arrayCPoints[0].vertex.x=result_cat[0];
+		arrayCPoints[0].vertex.y=result_cat[1];
+		arrayCPoints[0].vertex.z=result_cat[2];
+	}
 
     glFlush();
     glFinish();
@@ -133,7 +154,7 @@ void window_resize()
 
 void setup()
 {
-	float testm[16];
+	int i;
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
@@ -157,7 +178,6 @@ void setup()
 	glpiGetWindowSize(&win_width,&win_height);
 
 	window_resize();
-	weSplashInit(NULL,proj_matrix);
 
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
@@ -165,6 +185,13 @@ void setup()
 	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
 	printf("%i x %i \n",win_width,win_height);
+
+	for(i=0;i<N_COLORPOINTS;i++)
+	{
+		arrayCPoints[i].color.x=(rand()%255)/255.0f;
+		arrayCPoints[i].color.y=(rand()%255)/255.0f;
+		arrayCPoints[i].color.z=(rand()%255)/255.0f;
+	}
 }
 
 int main(void)
@@ -182,23 +209,6 @@ int main(void)
 	{
 		printf("Error: %i\n",res);
 		return 0;
-	}
-
-
-	res= wePointFromFile("trayectories/test_points.txt",&ptrData,&nPoints);
-	if(res<0)
-	{
-		printf("Error: %i\n",res);
-		return 0;
-	}
-	else
-	{
-		printf("Total Points Readed: %i\n",nPoints);
-
-		for(i=0;i<nPoints;i++)
-		{
-			printf("%f,%f,%f\n",ptrData[i].x,ptrData[i].y,ptrData[i].z);
-		}
 	}
 
 	res=weCatmullArrayFromFile("trayectories/test_points.txt",&tray_one);

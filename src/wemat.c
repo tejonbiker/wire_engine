@@ -34,16 +34,57 @@ void wematTranslateScale(float x,float y, float z, float s, float *m)
 
 void wematAddTranslate(float x,float y, float z, float *m)
 {
+	float buffer_m[16];
+	float buffer_m2[16];
 
-	printf("X: %f",x);
-	printf("Y: %f",y);
-	printf("Z: %f",z);
+	wematIdentity(buffer_m);
+		
+	buffer_m[12]+=x;
+	buffer_m[13]+=y;
+	buffer_m[14]+=z;
 
-	m[12]+=x;
-	m[13]+=y;
-	m[14]+=z;
+	wematMult(m,buffer_m,buffer_m2);
+	memcpy(m,buffer_m2,sizeof(float)*16);
 
 }
+
+int wematRotate(float polar,float azimutal, float *m)
+{
+	float rotPole[16],rotAzi[16];
+	float rotResult[16]={0};
+	float sinPolar,cosPolar;
+	float sinAzi,cosAzi;
+	
+	wematIdentity(rotPole);
+	wematIdentity(rotAzi);
+	
+	sinPolar=sin(polar);
+	cosPolar=cos(polar);
+	
+	rotPole[5]=cosPolar;
+	rotPole[6]=sinPolar;
+	
+	rotPole[9]=-sinPolar;
+	rotPole[10]=cosPolar;
+	
+	sinAzi=sin(azimutal);
+	cosAzi=cos(azimutal);
+	
+	rotAzi[0]=cosAzi;
+	rotAzi[2]=-sinAzi;
+	
+	rotAzi[5]=1;
+	rotAzi[8]=sinAzi;
+	
+	rotAzi[10]=cosAzi;
+	
+	wematMult(rotPole, rotAzi, rotResult);
+	wematMult(m,rotResult,rotPole);
+	
+	memcpy(m,rotPole ,sizeof(float)*16);
+	return 0;
+}
+
 
 void wematMult(float *A, float *B, float *C)
 {
@@ -186,12 +227,27 @@ int wematTransponse(float *A, float *result)
 
 void    wematAddScale(float sx,float sy,float sz, float *m)
 {
+	
+	float buffer_m[16];
+	float buffer_m2[16];
+
 	if(m==NULL)
 		return;
-	
+
+	/*	
 	m[0]=m[0]*sx;
 	m[5]=m[5]*sy;
 	m[10]=m[10]*sz;
+	*/
+
+	wematIdentity(buffer_m);
+		
+	buffer_m[0]*=sx;
+	buffer_m[5]*=sy;
+	buffer_m[10]*=sz;
+
+	wematMult(m,buffer_m,buffer_m2);
+	memcpy(m,buffer_m2,sizeof(float)*16);
 }
 
 int		wematOrtho(float left, float right, float bottom, float top, float nearVal, float farVal, float *m)

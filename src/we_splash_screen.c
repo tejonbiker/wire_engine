@@ -144,6 +144,11 @@ int	weSplashInit(char *path_res, float *projection)
 		textures_id[i]=SOIL_load_OGL_texture(buffer,SOIL_LOAD_AUTO,SOIL_CREATE_NEW_ID,
 				      SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT);
 
+		glBindTexture(GL_TEXTURE_2D,textures_id[i]);
+
+		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+
 		weQuadCreate(WireArray+i,white_color,textures_id[i]);
 	}
 
@@ -152,23 +157,38 @@ int	weSplashInit(char *path_res, float *projection)
 
 	ready=1;
 
-	printf("..........\n");
-	//wematIdentity(modelview);
-	wematAddTranslate(0.1,0.1,0.1,modelview); 
-	wematPrint(modelview);
-
 	return 0;
 }
 
 int	weSplashPlay()
 {
-	/*
 	int i;
+	float mv[16];
+	static float s=0.0f;
 
-	printf("..........\n");
-	wematAddTranslate(0.1,0.1,0.1,modelview); 
-	wematPrint(modelview);
-	*/
+	if(ready==0)
+	{
+		printf("Sorry, you need call weSplashInit() function before calling this\n");
+		return -1;
+	}
+
+	glUseProgram(splash_shaders.program);
+
+
+	wematIdentity(mv);
+	//wematRotate(s,s,mv);
+	wematAddScale(0.5,0.5,0.5,mv);
+	wematAddTranslate(-0.75,0.0,0.0,mv);  
+
+	s+=0.01;
+
+	for(i=0;i<4;i++)
+	{
+		
+		
+		weDrawQuad(WireArray+i,mv);
+		wematAddTranslate(0.5,0.0,0.0,mv);
+	}	
 
 	return 0;   
 }

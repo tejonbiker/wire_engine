@@ -3,8 +3,19 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "we_opengl_hd.h"
 
+typedef struct tagWEVec3{
+	float x,y,z;
+}WEVect3;
+
+typedef strcut tagWEPoint{
+	float vertex[3];
+	float color[3];
+	float texcoord[2];
+	float normal[3];
+}WEPoint;
 
 typedef struct tagWEQuad{
 float 	vertex[12];
@@ -15,9 +26,21 @@ GLushort	indices[6];
 int 	texture_id;
 }WEQuad;
 
-int  weQuadCreate(WEQuad *object,float *color,int texture_id); //Create a quad with normal outside the screen
-int  weQuadDelete(WEQuad *object);
+typedef struct tagWEShaderVars{
+	GLint vertex_attrib;
+	GLint color_attrib;
+	GLint normal_attrib;
+	GLint texture_attrib;
+	GLint sampler;
+	GLint modelview;
+}WEShaderVars;
 
+int  weQuadCreate(WEQuad *object,float *color,int texture_id); 	//Create a quad with normal outside the screen
+int  weQuadCoordTex(float *ct,WEQuad *quad);		      	//Setup the texture coords of an Quad
+
+int  wePointFromFile(char *filename,WEVect3 **ptrDest,int *n); //Read points from file, in n is the total points readed
+int  wePointDraw(WEVect3 *array, int nPoints ,WEShaderVars *shader_vars, float *color, float *mv);
+int  wePointDrawColor(WEVect3 *array,WEVect3 *color,int nPoints, WEShaderVars *shader_vars, float *mv);
 
 #endif
 
