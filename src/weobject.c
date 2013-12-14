@@ -1,6 +1,6 @@
 #include "weobject.h"
 
-int  weQuadCreate(WEQuad *object,float *color,int texture_id) //Create a quad with normal pointing to outside ofthe screen
+int  weQuadInit(WEQuad *object,float *color,int texture_id) //Create a quad with normal pointing to outside ofthe screen
 {
 	float *ptr_vertex=NULL;
 
@@ -66,6 +66,34 @@ int  weQuadCoordTex(float *ct,WEQuad *quad)
 	return 0;
 }
 
+int  weQuadDraw(WEQuad *object,WEShaderVars *shader_vars,float *mv)
+{
+	if(object==NULL || shader_vars==NULL|| mv==NULL)
+		return -1;
+
+	glEnableVertexAttribArray(shader_vars->color_attrib);
+	glEnableVertexAttribArray(shader_vars->texture_attrib);
+	glEnableVertexAttribArray(shader_vars->vertex_attrib);
+
+	glEnable(GL_TEXTURE_2D);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D,object->texture_id);
+
+	glUniform1i(shader_vars->sampler,0);
+
+	glVertexAttribPointer(shader_vars->color_attrib,3,GL_FLOAT,0,0,object->color);
+	glVertexAttribPointer(shader_vars->texture_attrib,2,GL_FLOAT,0,0,object->texture);
+	glVertexAttribPointer(shader_vars->vertex_attrib,3,GL_FLOAT,0,0,object->vertex);
+
+	glUniformMatrix4fv(shader_vars->modelview,1,0,mv);
+
+	glDrawElements(GL_TRIANGLES,6,GL_UNSIGNED_SHORT,object->indices);
+
+	glDisableVertexAttribArray(shader_vars->color_attrib);
+	glDisableVertexAttribArray(shader_vars->vertex_attrib);
+	glDisableVertexAttribArray(shader_vars->texture_attrib);
+}
+
 int  weVect3FromFile(char *filename,WEVect3 **ptrDest,int *n) //Read points from file, in n is the total points readed
 {
 	FILE *filePoints=NULL;
@@ -82,7 +110,7 @@ int  weVect3FromFile(char *filename,WEVect3 **ptrDest,int *n) //Read points from
 
 	fscanf(filePoints,"%i",n);
 
-	ptrBuffer=ptrDest;
+	ptrBuffer=*ptrDest;
 
 	ptrBuffer=(WEVect3*)malloc(sizeof(WEVect3)*(*n));
 
@@ -111,6 +139,11 @@ int  weVect3FromFile(char *filename,WEVect3 **ptrDest,int *n) //Read points from
 	return 0;
 }
 
+int  weVect3Delete(WEVect3 *array)
+{
+	free(array);
+}
+
 int  weVect3Draw(WEVect3 *array,int nPoints, WEShaderVars *shader_vars, float *color, float *mv)
 {
 	float *colors;
@@ -137,6 +170,7 @@ int  weVect3Draw(WEVect3 *array,int nPoints, WEShaderVars *shader_vars, float *c
 	glEnableVertexAttribArray(shader_vars->vertex_attrib);
 
 	glDisable(GL_TEXTURE_2D);
+	//glEnable(GL_TEXTURE_2D);
 
 	glVertexAttribPointer(shader_vars->color_attrib,3,GL_FLOAT,0,0,colors);
 	glVertexAttribPointer(shader_vars->vertex_attrib,3,GL_FLOAT,0,0,&(array->x));	

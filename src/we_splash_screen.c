@@ -33,7 +33,11 @@ typedef struct tagSplashVars{
 	GLint Texture;
 }SplashVars;
 
+static WEShaderVars shader_vars={0};
 static SplashVars splashVars={0};
+
+static CatmullArray anim_position,anim_scale;
+static WEQuadAnim   quad_anim;
 
 int     weDrawQuad(WEQuad *object,float *mv)
 {	
@@ -103,6 +107,8 @@ int	weSplashInit(char *path_res, float *projection)
 	int res;
 	int i;
 	float modelview[20];
+	float *ptr_aux=NULL;
+	float norm;
 
 	printf("Loading resources for splash screen\n");
 	
@@ -149,11 +155,49 @@ int	weSplashInit(char *path_res, float *projection)
 		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 
-		weQuadCreate(WireArray+i,white_color,textures_id[i]);
+		weQuadInit(WireArray+i,white_color,textures_id[i]);
 	}
 
 	glUniformMatrix4fv(splashVars.Projection,1,0,projection);
-	//memcpy(proj_buffer,projection,sizeof(float)*16);
+
+	shader_vars.vertex_attrib	=splashVars.Vertex;
+	shader_vars.color_attrib	=splashVars.Colors;
+	shader_vars.texture_attrib	=splashVars.Texture;
+	shader_vars.sampler		=splashVars.Sampler;
+	shader_vars.modelview		=splashVars.Modelview;
+
+	weCatmullArrayCreate(&anim_position,10);
+	ptr_aux=(float*)anim_position.points;
+
+	for(i=0;i<anim_position.nPoints;i++,ptr_aux+=3)
+	{
+		norm=((i/(float)anim_position.nPoints) - 0.5)*2;
+		ptr_aux[0]=norm;
+		ptr_aux[1]=fabs(0.5*exp(-norm)*sin(5*norm));
+		ptr_aux[2]=0;
+	}
+
+	weCatmullArrayCreate(&anim_scale,10);
+	ptr_aux=(float*)anim_scale.points;
+
+	for(i=0;i<anim_scale.nPoints;i++,ptr_aux+=3)
+	{
+		norm=((i/(float)anim_scale.nPoints) - 0.5)*2;
+		ptr_aux[0]=fabs(cos(5*norm)*0.5)+0.5;
+		ptr_aux[1]=fabs(sin(5*norm))+0.5;
+		ptr_aux[2]=0;
+	}
+	
+	ptr_aux=(float*)anim_position.points;
+	printf("Printing points...%i\n",anim_position.nPoints);
+	for(i=0;i<anim_position.nPoints;i++,ptr_aux+=3)
+	{
+		printf("%f, %f, %f\n",ptr_aux[0],ptr_aux[1],ptr_aux[2]);
+	}
+
+	quad_anim.quad=WireArray;
+	quad_anim.position=&anim_position;
+	quad_anim.scale=&anim_scale;
 
 	ready=1;
 
@@ -165,6 +209,8 @@ int	weSplashPlay()
 	int i;
 	float mv[16];
 	static float s=0.0f;
+	float black[3]={0.0,0.0,0.0};	
+	int res;
 
 	if(ready==0)
 	{
@@ -175,6 +221,7 @@ int	weSplashPlay()
 	glUseProgram(splash_shaders.program);
 
 
+	/*
 	wematIdentity(mv);
 	//wematRotate(s,s,mv);
 	wematAddScale(0.5,0.5,0.5,mv);
@@ -184,11 +231,24 @@ int	weSplashPlay()
 
 	for(i=0;i<4;i++)
 	{
-		
-		
-		weDrawQuad(WireArray+i,mv);
+		//weDrawQuad(WireArray+i,mv);
+		weQuadDraw(WireArray+i,&shader_vars,mv);
 		wematAddTranslate(0.5,0.0,0.0,mv);
-	}	
+	}
+	*/	
+
+	/*
+	wematIdentity(mv);
+	res=weVect3Draw(anim_position.points,anim_position.nPoints,&shader_vars,black,mv);
+
+	if(res<0)
+		printf("Error: %i\n",res);
+	*/
+
+	wematIdentity(mv);
+	//weQuadDraw(WireArray,&shader_vars,mv);
+	weCatmullQuadAnimDisplay(&quad_anim,&shader_vars,0.1,mv);
+
 
 	return 0;   
 }

@@ -44,6 +44,7 @@
 #endif
 
 #include <stdio.h>
+#include <string.h>
 
 enum{
 	SUT_ERR_ARG=-1,

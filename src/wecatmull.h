@@ -5,6 +5,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include "weobject.h"
+#include "we_opengl_hd.h"
+#include "wemat.h"
 
 #define WE_ERR_FILE     -1
 #define WE_ERR_OVERFLOW -2
@@ -24,13 +26,20 @@ typedef struct tagCatmullArray{
 	float	currentEval;
 }CatmullArray;
 
+typedef struct tagWEQuadAnim{
+	WEQuad       *quad;
+	CatmullArray *position;
+	CatmullArray *scale;
+}WEQuadAnim;
 
 int weCatmullArrayCreate(CatmullArray *array,int nPoints);				//Create memory ofr array of "nPoints"
 int weCatmullArrayDelete(CatmullArray *array);						//Delete Arrays
 int weCatmullEval(float *p1,float *p2, float *p3, float *p4,float t, float *result); 	//Evaluate 4 points through "t"
 int weCatmullEvalArray(CatmullArray *pointList,float step,float *result_cat);				//Evaluate an Array of points, automatically change segments  
 int weCatmullArrayFromFile(char *filename,CatmullArray *arrayDest);			//Load a list of points from file
-int weCatMullRewind(CatmullArray *array);
+int weCatmullRewind(CatmullArray *array);
+
+int weCatmullQuadAnimDisplay(WEQuadAnim *quad_anim,WEShaderVars *shader_vars,float step, float *mv);
 
 #endif
 

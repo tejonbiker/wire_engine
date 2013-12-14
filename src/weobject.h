@@ -35,10 +35,15 @@ typedef struct tagWEShaderVars{
 	GLint modelview;
 }WEShaderVars;
 
-int  weQuadCreate(WEQuad *object,float *color,int texture_id); 	//Create a quad with normal outside the screen
+
+
+int  weQuadInit(WEQuad *object,float *color,int texture_id); 	//Create a quad with normal outside the screen
 int  weQuadCoordTex(float *ct,WEQuad *quad);		      	//Setup the texture coords of an Quad
+int  weQuadDraw(WEQuad *object,WEShaderVars *shader_vars,float *mv);
+
 
 int  weVect3FromFile(char *filename,WEVect3 **ptrDest,int *n); //Read points from file, in n is the total points readed
+int  weVect3Delete(WEVect3 *array);
 int  weVect3Draw(WEVect3 *array, int nPoints ,WEShaderVars *shader_vars, float *color, float *mv);
 int  wePointDraw(WEPoint *array,int nPoints,WEShaderVars *shader_vars, float *mv);
 

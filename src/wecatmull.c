@@ -10,6 +10,10 @@ int weCatmullArrayCreate(CatmullArray *array,int nPoints)				//Create memory ofr
 	if(array->points==NULL)
 		return -2;
 
+	array->nPoints=nPoints;
+	array->currentPoint=0;
+	array->currentEval=0.0f;
+
 	return 0;
 }
 
@@ -95,4 +99,42 @@ int weCatmullRewind(CatmullArray *array)
 
 	array->currentPoint=0;
 	array->currentEval=0.0f;
+}
+
+int weCatmullQuadAnimDisplay(WEQuadAnim *quad_anim,WEShaderVars *shader_vars,float step, float *mv)
+{
+	WEQuad 		*quad=NULL;
+	CatmullArray 	*position=NULL,*scale=NULL;
+	float		cat_pos[3], cat_scale[3];
+	int		res_pos=0,res_scale=0;
+	float		mv_quad[16];
+
+	if(quad_anim==NULL || shader_vars==NULL)
+		return -1;
+
+	quad 	 =(quad_anim->quad);
+	position =(quad_anim->position);
+	scale 	 =(quad_anim->scale);
+
+	if(quad==NULL && (position==NULL || scale==NULL) )
+		return -2;
+
+	memcpy(mv_quad,mv,sizeof(float)*16);
+
+	if(scale!=NULL)
+	{
+		res_scale=weCatmullEvalArray(scale,step,cat_scale);
+		wematAddScale(cat_scale[0],cat_scale[1],cat_scale[2],mv_quad);
+	}
+
+	if(position!=NULL);
+	{
+		res_pos=weCatmullEvalArray(position,step,cat_pos);
+		wematAddTranslate(cat_pos[0],cat_pos[1],cat_pos[2],mv_quad);
+	}
+
+
+	weQuadDraw(quad,shader_vars,mv_quad);
+
+	return 0;
 }

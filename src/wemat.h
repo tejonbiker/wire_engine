@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <math.h>
 
 //Error values definitions
 #define WEMAT_ERR_ARG -1		//Argument Error: Is returned when a parameter is null (the most common motive) or invalid

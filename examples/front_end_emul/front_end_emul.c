@@ -54,35 +54,21 @@ void display()
     if(t>1.0f)
 	t=0.0f;
 
-    if(transition>1.0f)
-	transition=1.0f;
-
     glClearColor(1.0,1.0,1.0,transition);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
+    	if(transition>1.0f)
+		transition=1.0f;
+    	else
+	{
+		glFlush();
+    		glFinish();
+    		glpiSwapBuffers();
+		return;
+	}
 
-    //weSplashPlay();
+    weSplashPlay();
 
-    /*
-    weCatmullEval(&(tray_one.points[0].x),
-		  &(tray_one.points[1].x),
-		  &(tray_one.points[2].x),
-		  &(tray_one.points[3].x),t,result_cat);    
-   */
-
-   res=weCatmullEvalArray(&tray_one,0.005,result_cat);
-
-   if(res==1)
-   {
-	weCatmullRewind(&tray_one);
-   }
-
-
-    memcpy(&(vect_result.x),result_cat,sizeof(float)*3);
-
-    wematIdentity(mv_points);
-    glUseProgram(ShaderInfo.program);
-    //weVect3Draw(tray_one.points,tray_one.nPoints,&points_shader_vars,color_points,mv_points);
-    weVect3Draw((WEVect3*)result_cat,1,&points_shader_vars,color_points,mv_points);
 
     glFlush();
     glFinish();
