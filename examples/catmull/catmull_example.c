@@ -25,21 +25,67 @@ typedef struct tagVarShaders{
 varShaders VarShaders;
 
 //Estructuras para los shaders
-BaseShader ShaderInfo;
-WEShaderVars   points_shader_vars;
+BaseShader 	ShaderInfo;
+WEShaderVars    points_shader_vars;
 
 int win_width, win_height;
 float proj_matrix[16];
 
 #define N_COLORPOINTS 200
+#define N_SERPENTINES 5
 
 int skip=3;
 
-
 WEPoint arrayCPoints[N_COLORPOINTS];
+
+typedef struct tagSerpentine{
+	WEPoint 	arrayCPoints[N_COLORPOINTS];
+	CatmullArray 	tray;
+	float           colori[3];
+	float		colorf[3];
+}Serpentine;
+
+Serpentine serpentines[N_SERPENTINES];
 
 int fillVector=0;
 
+void generatePoints(WEVect3 *array,int nPoints) 
+{	
+	int i;
+	float *ptrV=NULL;
+
+	if(array==NULL|| nPoints<=0)
+		return;
+
+	ptrV=(float*)array;
+	for(i=0;i<nPoints;i++,ptrV+=3)
+	{
+		ptrV[0]= 2*( -(rand()%1024)/1024.0f + 0.5 );
+		ptrV[1]= 2*( -(rand()%1024)/1024.0f + 0.5 );
+		ptrV[2]=0.0f;
+	}
+}
+
+void generateNextPoint(WEVect3 *array,int nPoints)
+{
+	int i;
+	float *ptrV=NULL,*ptrVBef=NULL;
+
+	ptrVBef=(float*)(array);
+
+	for(i=1;i<nPoints-1;i++,ptrVBef+=3)
+	{
+		ptrV=ptrVBef+3;
+
+		ptrVBef[0]=ptrV[0];
+		ptrVBef[1]=ptrV[1];
+		ptrVBef[2]=ptrV[2];
+	}
+
+	ptrV[0]= 0.90*2*( -(rand()%1024)/1024.0f + 0.5 );
+	ptrV[1]= 0.90*2*( -(rand()%1024)/1024.0f + 0.5 );
+	ptrV[2]=0.0f;
+}
 
 void display()
 {
@@ -79,16 +125,17 @@ void display()
 	}		
 
    	res=weCatmullEvalArray(&tray_one,0.005,result_cat);
-
+	
    	if(res==1)
    	{
+		generateNextPoint(tray_one.points,tray_one.nPoints);
 		weCatmullRewind(&tray_one);
    	}
 
     	wematIdentity(mv_points);
     	glUseProgram(ShaderInfo.program);
     	//weVect3Draw(tray_one.points,tray_one.nPoints,&points_shader_vars,color_points,mv_points);
-    	weVect3Draw((WEVect3*)result_cat,1,&points_shader_vars,color_points,mv_points);
+    	//weVect3Draw((WEVect3*)result_cat,1,&points_shader_vars,color_points,mv_points);
 	wePointDraw(arrayCPoints,fillVector,&points_shader_vars,mv_points);
 
     	if(fillVector<=N_COLORPOINTS-1)
@@ -165,6 +212,7 @@ void window_resize()
 void setup()
 {
 	int i;
+	srand(time(NULL));
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
@@ -221,7 +269,9 @@ int main(void)
 		return 0;
 	}
 
-	res=weCatmullArrayFromFile("trayectories/test_points.txt",&tray_one);
+	//res=weCatmullArrayFromFile("trayectories/test_points.txt",&tray_one);
+	res=weCatmullArrayCreate(&tray_one,4);
+	
 	if(res<0)
 	{
 		printf("Error Cat: %i\n",res);
@@ -229,6 +279,8 @@ int main(void)
 	}
 	else
 	{
+		generatePoints(tray_one.points,tray_one.nPoints);
+
 		printf("Total Points Readed Cat: %i\n",tray_one.nPoints);
 
 		for(i=0;i<tray_one.nPoints;i++)
@@ -236,6 +288,7 @@ int main(void)
 			printf("%f,%f,%f\n",tray_one.points[i].x,tray_one.points[i].y,tray_one.points[i].z);
 		}
 	}
+
 	
 	setup();
 
