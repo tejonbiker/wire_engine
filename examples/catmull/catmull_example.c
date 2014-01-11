@@ -5,12 +5,6 @@
 #include "wire_engine.h"
 #include <SOIL/SOIL.h>
 
-/*
-Simple example that shows a white_screen, the interesting part of this example resides in 
-glpi.h and glpi.c, this files are that init the buffers in the raspberry pi, this way of work
-don't use X window, draw direct in the screen.
-*/
-
 int finish=0;
 CatmullArray tray_one;
 
