@@ -33,6 +33,7 @@ typedef struct tagWEShaderVars{
 	GLint texture_attrib;
 	GLint sampler;
 	GLint modelview;
+	GLint program_id;
 }WEShaderVars;
 
 
