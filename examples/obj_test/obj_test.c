@@ -6,9 +6,7 @@
 #include <SOIL/SOIL.h>
 
 /*
-Simple example that shows a white_screen, the interesting part of this example resides in 
-glpi.h and glpi.c, this files are that init the buffers in the raspberry pi, this way of work
-don't use X window, draw direct in the screen.
+Example that show how to use the OBJ loader, it's very simple for the moment.
 */
 
 int finish=0;
@@ -31,6 +29,8 @@ WEShaderVars   points_shader_vars;
 int win_width, win_height;
 float proj_matrix[16];
 
+WEObjModel model;
+
 void display()
 {
     static int i=0;
@@ -51,24 +51,12 @@ void display()
     transition+=0.005f;
     t+=0.005;
 
-    if(t>1.0f)
-	t=0.0f;
+    if(transition>1.0f)
+	transition=1.0f;
 
     glClearColor(1.0,1.0,1.0,transition);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
-    	if(transition>1.0f)
-		transition=1.0f;
-    	else
-	{
-		glFlush();
-    		glFinish();
-    		glpiSwapBuffers();
-		return;
-	}
-
-    weSplashPlay();
-
 
     glFlush();
     glFinish();
@@ -84,7 +72,6 @@ void 	getShaderVars()
 	VarShaders.Modelview=glGetUniformLocation(ShaderInfo.program,"Modelview");
 	VarShaders.Position=glGetAttribLocation(ShaderInfo.program,"Position");
 	VarShaders.Colors=glGetAttribLocation(ShaderInfo.program,"Colors");
-
 
 	/*	
 	ptrVars=(GLint*)(&VarShaders);
@@ -143,7 +130,6 @@ void setup()
 	glpiGetWindowSize(&win_width,&win_height);
 
 	window_resize();
-	weSplashInit(NULL,proj_matrix);
 
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
@@ -151,6 +137,9 @@ void setup()
 	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
 	printf("%i x %i \n",win_width,win_height);
+
+	//Load obj object
+	weObjLoad(stdout,"obj/cube.obj",&model);
 }
 
 int main(void)
@@ -170,21 +159,6 @@ int main(void)
 		return 0;
 	}
 
-	res=weCatmullArrayFromFile("trayectories/test_points.txt",&tray_one);
-	if(res<0)
-	{
-		printf("Error Cat: %i\n",res);
-		return 0;
-	}
-	else
-	{
-		printf("Total Points Readed Cat: %i\n",tray_one.nPoints);
-
-		for(i=0;i<tray_one.nPoints;i++)
-		{
-			printf("%f,%f,%f\n",tray_one.points[i].x,tray_one.points[i].y,tray_one.points[i].z);
-		}
-	}
 	
 	setup();
 

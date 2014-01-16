@@ -15,6 +15,7 @@ Some features:
 
 -Direct Rendering on video buffer on Raspberry Pi (Via EGL)
 -Catmull interpolations
+-Obj simple loader
 */
 
 #include "glsut.h"
@@ -22,6 +23,6 @@ Some features:
 #include "we_splash_screen.h"
 #include "glpi.h"
 #include "wecatmull.h"
-
+#include "weobj.h"
 
 #endif

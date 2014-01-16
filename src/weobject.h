@@ -17,6 +17,11 @@ typedef struct tagWEPoint{
 	float normal[3];
 }WEPoint;
 
+
+typedef struct tagWEFace{
+	WEPoint point[3]; //Sorry it's the only primitive that GLES 2.0 accept
+}WEFace;
+
 typedef struct tagWEQuad{
 float 	vertex[12];
 float 	color[12];

@@ -26,11 +26,12 @@ typedef struct tagWEObjMat{
 
 typedef struct tagWEObjModel{
 	float nFaces;
-	WEPoint *faces;
+	WEFace *faces;
 }WEObjModel;
 
 
 int weObjLoad(FILE *outmsg,char *filename,WEObjModel *model);
+int weObjDelete(WEObjModel *model);
 int weObjDraw(WEObjModel *model, WEShaderVars *shader_vars, float *mv);
 
 #endif
