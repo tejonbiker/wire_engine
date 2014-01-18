@@ -1,5 +1,23 @@
 #include "weobject.h"
 
+int  weShaderVarsPrint(WEShaderVars *vars)
+{
+	if(vars==NULL)
+		return -1;
+
+	printf("vertex_attrib: %i\n",vars->vertex_attrib);
+	printf("color_attrib: %i\n",vars->color_attrib);
+	printf("normal_attrib: %i\n",vars->normal_attrib);
+	printf("texture_attrib: %i\n",vars->texture_attrib);
+	printf("normal_matrix: %i\n",vars->normal_matrix);
+	printf("program_id: %i\n",vars->program_id);
+	printf("sampler: %i\n",vars->sampler);
+	printf("modelview: %i\n",vars->modelview);
+	printf("projection: %i\n",vars->projection);
+
+	return 0;
+}
+
 int  weQuadInit(WEQuad *object,float *color,int texture_id) //Create a quad with normal pointing to outside ofthe screen
 {
 	float *ptr_vertex=NULL;

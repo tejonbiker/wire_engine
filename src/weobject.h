@@ -38,10 +38,13 @@ typedef struct tagWEShaderVars{
 	GLint texture_attrib;
 	GLint sampler;
 	GLint modelview;
+	GLint projection;
+	GLint normal_matrix;
 	GLint program_id;
 }WEShaderVars;
 
 
+int  weShaderVarsPrint(WEShaderVars *vars);
 
 int  weQuadInit(WEQuad *object,float *color,int texture_id); 	//Create a quad with normal outside the screen
 int  weQuadCoordTex(float *ct,WEQuad *quad);		      	//Setup the texture coords of an Quad

@@ -211,7 +211,7 @@ int wematInverse(float *A, float *result)
 	return 0;
 }
 
-int wematTransponse(float *A, float *result)
+int wematTranspose(float *A, float *result)
 {
 	int i,j;
 	
@@ -277,5 +277,18 @@ int		wematOrtho(float left, float right, float bottom, float top, float nearVal,
 	
 	//wematPrint(m);
 	
+	return 0;
+}
+
+int	wematNormalMatrix(float *src, float *dest)
+{
+
+	float inv[16];
+	
+	if(src==NULL || dest==NULL)
+		return -1;
+
+	wematInverse(src,inv);
+	wematTranspose(inv,dest);
 	return 0;
 }

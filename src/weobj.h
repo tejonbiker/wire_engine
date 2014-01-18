@@ -27,6 +27,8 @@ typedef struct tagWEObjMat{
 typedef struct tagWEObjModel{
 	float nFaces;
 	WEFace *faces;
+	float *vertex;
+	float *normal;
 }WEObjModel;
 
 

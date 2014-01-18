@@ -30,10 +30,10 @@ void	wematIdentity(float *m);
 void	wematMult(float *A, float *B, float *C);
 int	wematInverse(float *A, float *result);
 int	wematODEtoGL(float *rot,float *pos,float *m16);
-int	wematTransponse(float *A, float *result);
+int	wematTranspose(float *A, float *result);
 int	wematOrtho(float left, float right, float bottom, float top, float nearVal, float farVal, float *m);
 int     wematMultVector(float *m, float *vec4, float *res4);
-
+int	wematNormalMatrix(float *src, float *dest);
 
 #endif
 

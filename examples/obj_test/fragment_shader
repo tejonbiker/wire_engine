@@ -1,6 +1,32 @@
-varying  vec4			DestColor;
+uniform mat4 Modelview;
+uniform mat4 NormalMatrix;
+
+struct Light{
+	vec3 position;
+	vec3 intensity;
+}light;
+
+varying   vec3 outNormal;
+varying   vec3 outVertex;
+varying   vec3 ecPos;
 
 void main(void)
 {
-     gl_FragColor=DestColor;
+	light.position=vec3(0.0,0.0,1.0);
+	light.intensity=vec3(0.5);
+
+	mat3 normalMatrix = mat3(Modelview);
+	vec3 normal=normalize(normalMatrix*outNormal);
+	
+	vec3 fragPosition=vec3(Modelview*vec4(outVertex,1));
+
+	vec3  surfaceToLight=light.position - outVertex;
+
+	float brightness=dot(outNormal,surfaceToLight)/(length(surfaceToLight)*length(outNormal));
+
+	brightness=clamp(brightness,0.0,1.0);
+
+	gl_FragColor=brightness*vec4(light.intensity,1);
+	gl_FragColor=vec4(0.5);
+      	//gl_FragColor=vec4(0.0,0.0,0.0,1.0);
 }

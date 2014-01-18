@@ -1,10 +1,27 @@
 uniform   mat4 Modelview;
+uniform   mat4 NormalMatrix;
+uniform   mat4 Projection;
 attribute vec4 Position;
 attribute vec4 Colors;
-varying   vec4 DestColor;
+attribute vec4 Normal;
+
+varying   vec3 outNormal;
+varying   vec3 outVertex;
+varying   vec3 ecPos;
+
 
 void main(void)
 {
-  gl_Position=Modelview*Position; 
-  DestColor=Colors;
+	vec3 aux;
+
+  	//gl_Position=Modelview*Position*NormalMatrix*Normal; 
+	//gl_Position=Modelview*Normal;
+	//gl_Position=Modelview*Position;
+
+	outVertex=vec3(Position);
+	outNormal=vec3(Normal);
+
+	gl_Position=Modelview*Position;
+
+
 }
