@@ -1,5 +1,8 @@
-/* A simple server in the internet domain using TCP
- The port number is passed as an argument */
+/*
+	Code fixed by using 
+	https://github.com/richardghirst/PiBits/tree/master/MPU6050-Pi-Demo
+	as reference.
+*/
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -154,13 +157,13 @@ int main(int argc, char *argv[])
 				accelerations[2]=(short)(((unsigned char)low) + ((unsigned char)(high))*256);
 				if(i==3)
 					//temperature
-					//fprintf(mpu_log_ptr,"%f \t",accelerations[2]/340.0f +36.53f);
+					fprintf(mpu_log_ptr,"%f \t",accelerations[2]/340.0f +36.53f);
 					result++;
 				else
-					//fprintf(mpu_log_ptr,"%hi \t",accelerations[2]);
+					fprintf(mpu_log_ptr,"%hi \t",accelerations[2]);
 					result--;
 			}
-			//fprintf(mpu_log_ptr,"\n");
+			fprintf(mpu_log_ptr,"\n");
 		}
 
 		ptr_exchange_buffer=ptr_buffer_current;
