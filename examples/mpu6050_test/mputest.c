@@ -12,6 +12,7 @@
 //RPi headers!!!
 #include <wiringPi.h> 
 #include <wiringPiI2C.h>
+#include <linux/i2c-dev.h>
 
 #define RPI_SERVER
 
@@ -42,8 +43,13 @@ int main(int argc, char *argv[])
 	int sample_print=300;
 	clock_t start_time,end_time;
 	unsigned char buffer_read[14];
+	unsigned char buffer_before[14];
+	unsigned char *ptr_buffer_current=buffer_read;
+	unsigned char *ptr_buffer_before=buffer_before;
+	unsigned char *ptr_exchange_buffer=NULL;
 	int result;
 	off_t real_offset;
+	int total_read=0;
 
 	/*
 	printf("Ajustando GPIO...\n");
@@ -81,10 +87,10 @@ int main(int argc, char *argv[])
 	wiringPiI2CWriteReg8(accel,0x6B,0x00);
 	//Enable 16 bit format
 	wiringPiI2CWriteReg8(accel,0x21,0x01);
-	//Disable FSYNC and enable 1 KHz sample rate (enable DLPF)
-	wiringPiI2CWriteReg8(accel,0x26,0x01);
+	//Disable FSYNC and enable 1 KHz sample rate (disable DLPF)
+	wiringPiI2CWriteReg8(accel,0x1A,0x00);
 	//disable sample rate division
-	wiringPiI2CWriteReg8(accel,0x25,0x00);
+	wiringPiI2CWriteReg8(accel,0x19,0x00);
 
 	//Open the file log
 	mpu_log_ptr=fopen("mpu6050.log","wt");
@@ -94,6 +100,8 @@ int main(int argc, char *argv[])
 		printf("Sorry, the file cannot be created, be sure you have permissions\n");
 		return -1;
 	}
+	
+	memset(ptr_buffer_before,0,14);
 
 	
 	start_time=clock();
@@ -123,32 +131,41 @@ int main(int argc, char *argv[])
 		sleep(1);
 		*/
 		
+		/*
 		buffer_read[0]=0x68 | 0x00;  //Address - Write
-		buffer_read[1]=0x3B;           //Register - Start
+		buffer_read[1]= 0x3B;          //Register - Start
 		result=write(accel,buffer_read,2);
-
-		buffer_read[0]=0x68 | 0x08;  //Address - Read
-		result=write(accel,buffer_read,1);
-		result=read(accel,buffer_read,14);
-		
-		
-		for(i=0;i<14;i++)
-		{
-			printf("%x, ",buffer_read[i]);
-		}
-		printf("\n");
-		
-
-		/*		
-		//Request Accel  for Z
-		low=buffer_read[9];
-		high=buffer_read[8];
-		accelerations[2]=(short)(((unsigned char)low) + ((unsigned char)(high))*256);
-		printf("%hi\n",accelerations[2]);
 		*/
+
+		ioctl(accel,I2C_SLAVE,0x68);
+		ptr_buffer_current[0]=0x3B;                
+		result=write(accel,ptr_buffer_current,1);
+		result=read(accel,ptr_buffer_current,14);
 		
-	
-	
+		result=memcmp(ptr_buffer_before,ptr_buffer_current,14);
+
+		if(result!=0)
+		{	
+			data_written++;
+			for(i=0;i<7;i++)
+			{	
+				low=buffer_read[i*2+1];
+				high=buffer_read[i*2];
+				accelerations[2]=(short)(((unsigned char)low) + ((unsigned char)(high))*256);
+				if(i==3)
+					//temperature
+					//fprintf(mpu_log_ptr,"%f \t",accelerations[2]/340.0f +36.53f);
+					result++;
+				else
+					//fprintf(mpu_log_ptr,"%hi \t",accelerations[2]);
+					result--;
+			}
+			//fprintf(mpu_log_ptr,"\n");
+		}
+
+		ptr_exchange_buffer=ptr_buffer_current;
+		ptr_buffer_current=ptr_buffer_before;
+		ptr_buffer_before=ptr_exchange_buffer;
 
 		//sleep(1);
 
@@ -158,16 +175,17 @@ int main(int argc, char *argv[])
 		MPU_RAM_LOG[i*3+2]=accelerations[2];
 		*/
 
-		data_written++;
-		i++;
-
-		sample_print=500;
+		total_read++;
+		sample_print=1000;
 		if(data_written==sample_print)
 		{
 			end_time=clock();
-			printf("%i sampled, time %lf\n", sample_print,(double)(end_time - start_time)/CLOCKS_PER_SEC);
+			printf("%i sampled, time %lf, total read: %i\n", sample_print,(double)(end_time - start_time)/CLOCKS_PER_SEC,total_read);
+			fflush(mpu_log_ptr);
 			data_written=0;
+			total_read=0;
 			start_time=end_time;
 		}
+		
 	}
 }
