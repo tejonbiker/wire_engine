@@ -158,10 +158,10 @@ int main(int argc, char *argv[])
 				if(i==3)
 					//temperature
 					fprintf(mpu_log_ptr,"%f \t",accelerations[2]/340.0f +36.53f);
-					result++;
+					//result++;
 				else
 					fprintf(mpu_log_ptr,"%hi \t",accelerations[2]);
-					result--;
+					//result--;
 			}
 			fprintf(mpu_log_ptr,"\n");
 		}
