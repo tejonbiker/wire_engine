@@ -456,6 +456,7 @@ int	LIIRMatlabRead(LIIR *filter,char *filename)
 	b=(double*)malloc(sizeof(double)*lenghtCoeff);
 		
 	coeff_section=0;
+	readedCoeff=0;
 	while(1)
 	{
 		//read a line of the file
@@ -552,6 +553,11 @@ int	LIIRMatlabRead(LIIR *filter,char *filename)
 		printf("%lf, ",a[i]);
 	printf("\n");
 	*/
+
+	LIIRInit(filter,b,a,readedCoeff,readedCoeff);
+	//free(a);
+	//free(b);
+	//free(buffer_read);
 
 	fclose(matlab_file);
 	

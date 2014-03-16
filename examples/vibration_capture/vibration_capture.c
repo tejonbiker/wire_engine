@@ -74,19 +74,18 @@ int main(int argc, char *argv[])
 	wiringPiI2CWriteReg8(accel,0x6B,0x00);
 	//Enable 16 bit format
 	wiringPiI2CWriteReg8(accel,0x21,0x01);
-	//Disable FSYNC and enable 1 KHz sample rate (disable DLPF)
-	wiringPiI2CWriteReg8(accel,0x1A,0x00);
-	//Enable sample rate division to 29 Samples per second
+	//Disable FSYNC and enable 1 KHz sample rate, enable DLPF to 44 Hz bandwidth
+	wiringPiI2CWriteReg8(accel,0x1A,0x03);
+	//Enable sample rate division to 25 Samples per second
 	wiringPiI2CWriteReg8(accel,0x19,250);
 	
 	memset(ptr_buffer_before,0,14);
-
 
 	result = LIIRMatlabRead(&highpass,argv[1]);
 
 	if(result<0)
 	{
-		printf("An error ocurred during read file %s\n",argv[1]);
+		printf("An error has ocurred during reading the file %s\n",argv[1]);
 		return -1;
 	}
 	
