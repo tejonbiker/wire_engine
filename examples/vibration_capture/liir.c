@@ -9,6 +9,7 @@
 
 #include "liir.h"
 
+
 int	LIIRInit(LIIR *filter, double *b, double *a, int lenghtCoef, int lenghtInput)
 {
 	int i;
@@ -412,6 +413,147 @@ int LIIRFileWrite(LIIR *filter, char *filename)
 	}
 	
 	fclose(file);
+	
+	return 0;
+}
+
+int	LIIRMatlabRead(LIIR *filter,char *filename)
+{
+	FILE *matlab_file=NULL;
+	int end_read=0;
+	char *buffer_read=NULL;
+	int buffer_lenght=512;
+	char *ptr_line=NULL, *ptr_return=NULL;
+	char current_char;
+	double *a=NULL,*b=NULL,*tempArray=NULL;
+	int lenghtCoeff=0;
+	int readedCoeff=0;
+	int coeff_section=0;
+	int i;
+	
+	//Check's if some argument are NULL
+	if(filter==NULL||filename==NULL)
+		return -1;
+
+	//Open the file (fdatool ASCII format)
+	matlab_file=fopen(filename,"rt");
+
+	if(matlab_file==NULL)
+		return -2;
+
+	//request memory for the getline function
+	buffer_read=(char*)malloc(512);
+
+	if(buffer_read==NULL)
+	{
+		fclose(matlab_file);
+		return -3;
+	}
+
+	//Request memory for the coefficients readed (start with 4)
+	lenghtCoeff=2;
+	a=(double*)malloc(sizeof(double)*lenghtCoeff);
+	b=(double*)malloc(sizeof(double)*lenghtCoeff);
+		
+	coeff_section=0;
+	while(1)
+	{
+		//read a line of the file
+		ptr_return= fgets(buffer_read,buffer_lenght,matlab_file);
+
+		if(ptr_return==NULL)
+		{
+			printf("End of while\n");
+			break;
+		}
+
+		printf("Line readed:%s, ",buffer_read);
+
+		ptr_line=buffer_read;
+
+		//trimp out white spaces and tabulations
+		while(ptr_line[0]==' '|| ptr_line[0]=='\t')
+		{
+			//printf("_1\n");
+			ptr_line++;
+		}
+
+		
+		
+		//we get a empty line or comment?
+		if(ptr_line[0]=='\n' || ptr_line[0]=='%' || ptr_line[0]=='\0')
+		{
+			//this mean a end of section or comment
+			printf("Section or comment found\n");
+			coeff_section=0;
+			continue;		
+		}
+
+		//A coefficient sections start?
+		if(strncmp("Numerator:",ptr_line,10)==0 && coeff_section==0)
+		{
+			printf("Num Section start\n");	
+			coeff_section=1;
+			readedCoeff=0;
+			continue;
+		}else if(strncmp("Denominator:\n",ptr_line,10)==0 && coeff_section==1)
+		{
+			printf("Den Section start\n");
+		        coeff_section=2;
+			readedCoeff=0;
+			continue;
+		}
+
+		//let's work with them
+		switch(coeff_section)
+		{
+			case 1: //Numerator
+				//The memory of the coefficients are enough?
+				if(readedCoeff==lenghtCoeff)
+				{
+					//Double the size and copy
+					tempArray=(double*)malloc(sizeof(double)*lenghtCoeff*2);
+					memcpy(tempArray,b,sizeof(double)*lenghtCoeff);
+					lenghtCoeff=lenghtCoeff*2;
+					free(b);
+					b=tempArray;
+					tempArray=NULL;
+				}
+				sscanf(ptr_line,"%lf",b+readedCoeff);
+				readedCoeff++;
+			break;	
+
+			case 2: //Denominator
+				//Same process as Numerator but for a
+				if(readedCoeff==lenghtCoeff)
+				{
+					tempArray=(double*)malloc(sizeof(double)*lenghtCoeff*2);
+					memcpy(tempArray,a,sizeof(double)*lenghtCoeff);
+					lenghtCoeff=lenghtCoeff*2;
+					free(a);
+					a=tempArray;
+					tempArray=NULL;
+				}
+				sscanf(ptr_line,"%lf",a+readedCoeff);
+				readedCoeff++;
+			break;
+		}
+
+	}
+
+	//Checks if the values are correctly readed
+	/*
+	printf("b: ");
+	for(i=0;i<readedCoeff;i++)
+		printf("%lf, ",b[i]);
+	printf("\n a: ");
+
+	for(i=0;i<readedCoeff;i++)
+		printf("%lf, ",a[i]);
+	printf("\n");
+	*/
+
+	fclose(matlab_file);
 	
 	return 0;
 }
