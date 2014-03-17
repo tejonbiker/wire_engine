@@ -1,0 +1,7 @@
+//Fragment Shader for vibration_capture
+varying  vec4			DestColor;
+
+void main(void)
+{
+     gl_FragColor=DestColor;
+}

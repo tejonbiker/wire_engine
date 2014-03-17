@@ -1,0 +1,12 @@
+//Vertex Shader for vibration_capture
+uniform   mat4 Modelview;
+attribute vec4 Position;
+attribute vec4 Colors;
+varying   vec4 DestColor;
+
+void main(void)
+{
+  gl_Position=Modelview*Position; 
+  gl_PointSize=20.0;
+  DestColor=Colors;
+}
