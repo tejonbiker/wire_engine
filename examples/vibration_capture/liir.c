@@ -451,7 +451,7 @@ int	LIIRMatlabRead(LIIR *filter,char *filename)
 	}
 
 	//Request memory for the coefficients readed (start with 4)
-	lenghtCoeff=2;
+	lenghtCoeff=10;
 	a=(double*)malloc(sizeof(double)*lenghtCoeff);
 	b=(double*)malloc(sizeof(double)*lenghtCoeff);
 		
@@ -468,7 +468,7 @@ int	LIIRMatlabRead(LIIR *filter,char *filename)
 			break;
 		}
 
-		printf("Line readed:%s, ",buffer_read);
+		//printf("Line readed:%s, ",buffer_read);
 
 		ptr_line=buffer_read;
 
@@ -485,7 +485,7 @@ int	LIIRMatlabRead(LIIR *filter,char *filename)
 		if(ptr_line[0]=='\n' || ptr_line[0]=='%' || ptr_line[0]=='\0')
 		{
 			//this mean a end of section or comment
-			printf("Section or comment found\n");
+			//printf("Section or comment found\n");
 			coeff_section=0;
 			continue;		
 		}
@@ -493,13 +493,13 @@ int	LIIRMatlabRead(LIIR *filter,char *filename)
 		//A coefficient sections start?
 		if(strncmp("Numerator:",ptr_line,10)==0 && coeff_section==0)
 		{
-			printf("Num Section start\n");	
+			//printf("Num Section start\n");	
 			coeff_section=1;
 			readedCoeff=0;
 			continue;
 		}else if(strncmp("Denominator:\n",ptr_line,10)==0 && coeff_section==1)
 		{
-			printf("Den Section start\n");
+			//printf("Den Section start\n");
 		        coeff_section=2;
 			readedCoeff=0;
 			continue;
@@ -519,6 +519,12 @@ int	LIIRMatlabRead(LIIR *filter,char *filename)
 					free(b);
 					b=tempArray;
 					tempArray=NULL;
+					
+
+					tempArray=(double*)malloc(sizeof(double)*lenghtCoeff);
+					free(a);
+					a=tempArray;
+					tempArray=NULL;
 				}
 				sscanf(ptr_line,"%lf",b+readedCoeff);
 				readedCoeff++;
@@ -526,15 +532,6 @@ int	LIIRMatlabRead(LIIR *filter,char *filename)
 
 			case 2: //Denominator
 				//Same process as Numerator but for a
-				if(readedCoeff==lenghtCoeff)
-				{
-					tempArray=(double*)malloc(sizeof(double)*lenghtCoeff*2);
-					memcpy(tempArray,a,sizeof(double)*lenghtCoeff);
-					lenghtCoeff=lenghtCoeff*2;
-					free(a);
-					a=tempArray;
-					tempArray=NULL;
-				}
 				sscanf(ptr_line,"%lf",a+readedCoeff);
 				readedCoeff++;
 			break;
@@ -554,10 +551,11 @@ int	LIIRMatlabRead(LIIR *filter,char *filename)
 	printf("\n");
 	*/
 
+	printf("Readed Coef: %i\n", readedCoeff);
 	LIIRInit(filter,b,a,readedCoeff,readedCoeff);
-	//free(a);
-	//free(b);
-	//free(buffer_read);
+	free(a);
+	free(b);
+	free(buffer_read);
 
 	fclose(matlab_file);
 	

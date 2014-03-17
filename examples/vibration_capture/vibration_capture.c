@@ -75,12 +75,13 @@ int main(int argc, char *argv[])
 	//Enable 16 bit format
 	wiringPiI2CWriteReg8(accel,0x21,0x01);
 	//Disable FSYNC and enable 1 KHz sample rate, enable DLPF to 44 Hz bandwidth
-	wiringPiI2CWriteReg8(accel,0x1A,0x03);
+	wiringPiI2CWriteReg8(accel,0x1A,0x03); //0x03
 	//Enable sample rate division to 25 Samples per second
-	wiringPiI2CWriteReg8(accel,0x19,250);
+	wiringPiI2CWriteReg8(accel,0x19,39); //250
 	
 	memset(ptr_buffer_before,0,14);
 
+	
 	result = LIIRMatlabRead(&highpass,argv[1]);
 
 	if(result<0)
@@ -88,6 +89,7 @@ int main(int argc, char *argv[])
 		printf("An error has ocurred during reading the file %s\n",argv[1]);
 		return -1;
 	}
+	
 	
 	while(1)
 	{
@@ -97,15 +99,15 @@ int main(int argc, char *argv[])
 		result=write(accel,ptr_buffer_current,1);
 		result=read(accel,ptr_buffer_current,6);
 		
-		result=memcmp(ptr_buffer_before,ptr_buffer_current,14);
+		result=memcmp(ptr_buffer_before,ptr_buffer_current,6);
 
 		if(result!=0)
 		{	
 			data_written++;
 			for(i=0;i<3;i++) 
 			{	
-				low=buffer_read[i*2+1];
-				high=buffer_read[i*2];
+				low=ptr_buffer_current[i*2+1];
+				high=ptr_buffer_current[i*2];
 				accelerations[0]=(short)(((unsigned char)low) + ((unsigned char)(high))*256);
 				accel_float[i]=accelerations[0]*2/32768.0f;
 
@@ -122,8 +124,7 @@ int main(int argc, char *argv[])
 		sample_print=25;
 		if(data_written==sample_print)
 		{
-			printf("%i sampled, total read: %i\n", sample_print,total_read);
-			fflush(mpu_log_ptr);
+			printf("%i sampled, total read: %i\n",data_written,total_read);
 			data_written=0;
 			total_read=0;
 		}
