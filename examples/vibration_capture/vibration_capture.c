@@ -13,6 +13,7 @@
 #include <time.h>
 
 #include "liir.h"
+#include "wire_engine.h"
 
 //RPi headers!!!
 #include <wiringPi.h> 
@@ -175,7 +176,7 @@ int main(int argc, char *argv[])
 
 	if(result<0)
 	{
-		printf("An error has ocurred during the init of EGL"\n);
+		printf("An error has ocurred during the init of EGL\n");
 		return -1;
 	}
 
@@ -185,11 +186,11 @@ int main(int argc, char *argv[])
 	glClearDepthf(1.0f);
 	glDepthMask(GL_TRUE);	
 
-	result=initShaders();
+	result=InitShaders();
 	
 	if(result<0)
 	{
-		printf("An error has ocurred during the shader read"\n);
+		printf("An error has ocurred during the shader read\n");
 		return -1;
 	}
 
