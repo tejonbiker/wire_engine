@@ -56,12 +56,31 @@ enum{
 #define GLPL_MAX_SHADER_SIZE 5000
 
 
+//Holds the info of the program id, fragment id and vertex id
 #warning "Header included: glsut"
 typedef struct BaseShaderTag{
 	GLint vertex_shader;
 	GLint fragment_shader;
 	GLint program;
 }BaseShader;
+
+
+//Holds the info of the locations of the variables
+typedef struct tagShVarLocation {
+	GLint modelview;
+	GLint projection;
+	GLint vertices;
+	GLint colors;
+	GLint texcoord;
+	GLint sampler;
+}ShRootLocation;
+
+//Holds the info if shader program id and location of the vars
+typedef struct tagShProgVar{
+	BaseShader 	shaders_id;
+	ShVarLocation 	locations;
+}ShProgVar;
+
 
 int  glsutLoadShaders(FILE *messages, BaseShader *info_shader, char *fragment_file, char *vertex_file);
 //Similar to glplotLoadShader but can recibe from char
