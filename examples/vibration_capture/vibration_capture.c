@@ -76,7 +76,7 @@ int SetupAccelerometer(int *accel)
 	//Enable 16 bit format
 	wiringPiI2CWriteReg8(*accel,0x21,0x01);
 	//Disable FSYNC and enable 1 KHz sample rate, enable DLPF to 44 Hz bandwidth
-	wiringPiI2CWriteReg8(*accel,0x1A,0x02); //0x03
+	wiringPiI2CWriteReg8(*accel,0x1A,0x04); //0x03
 	//Enable sample rate division to 25 Samples per second
 	wiringPiI2CWriteReg8(*accel,0x19,39); //250
 }
@@ -185,6 +185,7 @@ int main(int argc, char *argv[])
 	glDepthFunc(GL_LEQUAL);
 	glClearDepthf(1.0f);
 	glDepthMask(GL_TRUE);	
+	glClearColor(1.0,1.0,1.0,1.0);
 
 	result=InitShaders();
 	
@@ -227,9 +228,9 @@ int main(int argc, char *argv[])
 			PointArray[0].pos[1]=0;
 			PointArray[0].pos[2]=0;
 
-			PointArray[0].color[0]=128;
-			PointArray[0].color[1]=100;
-			PointArray[0].color[2]=65;
+			PointArray[0].color[0]=128/255.0f;
+			PointArray[0].color[1]=100/255.0f;
+			PointArray[0].color[2]=65/255.0f;
 
 			
 			display(); //Call The OpenGL Drawing
