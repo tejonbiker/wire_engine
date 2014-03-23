@@ -24,7 +24,7 @@
 		path_rsc: path to the folder of the resources (textures and shaders)
 
 	Return
-		0 if all correct, -1 indicates error (in progress the translations)
+		0 if all correct, -1 indicates error (in progress the translate)
 */
 int WEManInit(char *path_rsc);		
 
@@ -33,7 +33,7 @@ int WEManInit(char *path_rsc);
 		int shaders_to_load: load several shaders (current three, in development!!!) example
 				     WE_POINTLINE_SH | WE_TEXTTRIANGLE | WE_TEXTLIGHT
 	Return
-		0 if all correct, <0 indicates error (in development the translactions)		
+		0 if all is correct, <0 indicates error (in development the translate)		
 */
 int WEManLoadShaders(int shaders_to_load);
 

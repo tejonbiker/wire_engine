@@ -140,8 +140,10 @@ int main(int argc, char *argv[])
 	int total_read=0;
 	float accel_float[3];
 	double filter_accel;
+	double sum;
 
 	LIIR highpass;
+	LIIR highpassY;
 
 	if(argc!=2)
 	{
@@ -160,6 +162,7 @@ int main(int argc, char *argv[])
 		
 	//Load the coefficients of highpass filter
 	result = LIIRMatlabRead(&highpass,argv[1]);
+	result = LIIRMatlabRead(&highpassY,argv[1]);
 
 	if(result<0)
 	{
@@ -208,24 +211,26 @@ int main(int argc, char *argv[])
 		if(result!=0)
 		{	
 			data_written++;
+			sum=0;
 			for(i=0;i<3;i++) 
 			{	
 				low=ptr_buffer_current[i*2+1];
 				high=ptr_buffer_current[i*2];
 				accelerations[0]=(short)(((unsigned char)low) + ((unsigned char)(high))*256);
-				accel_float[i]=accelerations[0]*2/32768.0f;
+				accel_float[i]=2*accelerations[0]/32768.0f;
 
-				//printf("%f ",accel_float[i]);
+				printf("%f ",accel_float[i]);
+				sum+=accel_float[i]*accel_float[i];
 
 			}
-			//printf("\n");
+			printf(" - %lf  \n", sqrt(sum));
 
 			LIIRFilter2(&highpass,accel_float[0],&filter_accel);
-			//printf("%f, %lf \t ",accel_float[0],filter_accel);
-			//printf("\n");
-
 			PointArray[0].pos[0]=filter_accel;
-			PointArray[0].pos[1]=0;
+
+			LIIRFilter2(&highpassY,accel_float[1],&filter_accel);
+			PointArray[0].pos[1]=filter_accel;
+
 			PointArray[0].pos[2]=0;
 
 			PointArray[0].color[0]=128/255.0f;

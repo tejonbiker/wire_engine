@@ -73,7 +73,7 @@ typedef struct tagShVarLocation {
 	GLint colors;
 	GLint texcoord;
 	GLint sampler;
-}ShRootLocation;
+}ShVarLocation;
 
 //Holds the info if shader program id and location of the vars
 typedef struct tagShProgVar{
