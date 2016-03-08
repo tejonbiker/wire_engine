@@ -1,0 +1,18 @@
+ FLAGS=-I/opt/vc/include/  -I/opt/vc/include/interface/vcos/pthreads/  -I/opt/vc/include/interface/vmcs_host/linux -I../../src/
+ LIBS= -L/usr/local/lib/ -L/opt/vc/lib -lfftw3 -lm -lGLESv2 -lEGL -lbcm_host  -lSOIL -lasound 
+ SRC = $(wildcard ../../src/*.c) fft_plotter_debug.c 
+ OBJECTS=$(SRC:.c=.o)
+ EXECUTABLE=fft_plotter.bin
+ CC=gcc
+
+all: $(SRC) $(EXECUTABLE)
+
+$(EXECUTABLE): $(OBJECTS)
+	$(CC) $(FLAGS) $(LIBS)  $(OBJECTS)  -o $@ -DGLPI
+
+.c.o:
+	$(CC) $(FLAGS) $(LIBS) -DGLPI -c  $<  -o  $@ 
+
+clean:
+	rm -f *.bin
+	rm -f $(OBJECTS)

@@ -65,15 +65,15 @@ void display()
     	glClearColor(1.0,1.0,1.0,transition);
     	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//wematIdentity(proj_matrix);
-	//glUniformMatrix4fv(points_shader_vars.projection,1,0,proj_matrix);
+	wematIdentity(proj_matrix);
+	glUniformMatrix4fv(points_shader_vars.projection,1,0,proj_matrix);
 
 	wematIdentity(rot_mat);
-	//wematIdentity(rot_buff);
-	//wematRotate(t,t,rot_buff);
-	//wematIdentity(mv_points);
-	//wematMult(mv_points,rot_buff,rot_mat);
-	//wematAddScale(0.20,0.20,0.20,rot_mat);
+	wematIdentity(rot_buff);
+	wematRotate(t,t,rot_buff);
+	wematIdentity(mv_points);
+	wematMult(mv_points,rot_buff,rot_mat);
+	wematAddScale(0.20,0.20,0.20,rot_mat);
 	//wematAddTranslate(0.5,0.5,0.0,rot_mat);
  	weObjDraw(&model,&points_shader_vars,rot_mat);
 	
